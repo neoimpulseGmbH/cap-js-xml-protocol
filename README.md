@@ -1,12 +1,13 @@
-
 # CDS XMLAdapter Plugin
 
-This plugin for the SAP Cloud Application Programming Model (CAP) adds support for XML payloads by extending the default REST adapter. It parses incoming XML payloads, converts them to JSON, and ensures compatibility with CAP's processing logic.
+This plugin for the SAP Cloud Application Programming Model (CAP) extends the default REST adapter to support XML payloads. It parses incoming XML data, converts it to JSON, and ensures compatibility with CAP's processing logic.
 
 ## Features
 
--   Automatically parses incoming XML payloads to JSON.
+-   Parses incoming XML payloads into JSON.
 -   Converts `Content-Type` from `application/xml` to `application/json` for CAP compatibility.
+-   Removes XML namespaces and attributes to create a clean JSON structure.
+-   Converts boolean values correctly (`"true"` → `true`, `"false"` → `false`).
 -   Returns appropriate error messages for invalid XML or unsupported content types.
 
 ## Installation
@@ -40,34 +41,38 @@ npm install cds-xmladapter-plugin
 
     Example XML payload:
     ```xml
-    <Book>
-        <ID>1</ID>
-        <title>XML for CAP</title>
-        <author>John Doe</author>
-    </Book>
+    <ExchangeRate>
+        <ID>123</ID>
+        <Rate>10.5</Rate>
+        <FromCurrency>EUR</FromCurrency>
+        <ToCurrency>USD</ToCurrency>
+        <IsValid>true</IsValid>
+    </ExchangeRate>
     ```
 
 3. **Handle XML Data in CAP**
 
-    The plugin automatically converts the XML to JSON, which can be processed by your CAP service logic as usual.
+    The plugin automatically converts the XML to JSON, which can be processed by your CAP service logic.
 
 ## How It Works
 
-The plugin hooks into CAP's middleware pipeline and processes incoming requests as follows:
+The plugin integrates with CAP's middleware pipeline and processes incoming requests as follows:
 
 1. Checks if the `Content-Type` is `application/xml`.
 2. Parses the XML payload into JSON using `xml2js`.
-3. Updates the `Content-Type` to `application/json` for compatibility with CAP services.
-4. Passes the parsed data to the next middleware in the chain.
+3. Removes XML namespaces and attributes.
+4. Converts boolean values (`"true"` → `true`, `"false"` → `false`).
+5. Updates the `Content-Type` to `application/json` for compatibility with CAP services.
+6. Passes the parsed data to the next middleware in the chain.
 
 If the `Content-Type` is not `application/xml`, it returns a `415 Unsupported Media Type` error. For invalid XML payloads, it returns a `400 Bad Request` error.
 
 ```javascript
 const cds = require("@sap/cds");
 const { parseStringPromise } = require("xml2js");
-const { RestAdapter } = require("@sap/cds/libx/rest/RestAdapter");
+const HttpAdapter = require("@sap/cds/lib/srv/protocols/http");
 
-class XMLAdapter extends RestAdapter {
+class XMLAdapter extends HttpAdapter {
     get router() {
         const router = super.router;
 
@@ -90,7 +95,19 @@ class XMLAdapter extends RestAdapter {
 
                 req.on("end", async () => {
                     try {
-                        const jsonBody = await parseStringPromise(xmlBody, { explicitArray: false });
+                        const jsonBody = await parseStringPromise(xmlBody, {
+                            explicitArray: false,
+                            ignoreAttrs: true,
+                            tagNameProcessors: [(name) => name.replace(/^.*:/, "")],
+                            valueProcessors: [
+                                (value) => {
+                                    if (value === "true") return true;
+                                    if (value === "false") return false;
+                                    return value;
+                                },
+                            ]
+                        });
+
                         req.body = jsonBody;
                         req.headers["content-type"] = "application/json";
                         next();
