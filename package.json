@@ -34,7 +34,7 @@
     },
     "devDependencies": {
         "prettier": "^3.3.3",
-        "semantic-release": "^24.0.0"
+        "semantic-release": "^24.2.1"
     },
     "cds": {
         "requires": {
