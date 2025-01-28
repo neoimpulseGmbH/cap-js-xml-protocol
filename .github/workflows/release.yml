@@ -1,4 +1,4 @@
-name: Release (cap-js-trim)
+name: Release (cap-js-xml-protocol)
 
 on:
     push:
