@@ -1,0 +1,44 @@
+{
+    "name": "@neoimpulse/cap-js-xml-protocol",
+    "version": "0.0.0-development",
+    "description": "A CDS plugin to provide the xml protocol",
+    "main": "cds-plugin.js",
+    "scripts": {
+        "pretty": "npx prettier --write ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/neoimpulseGmbH/cap-js-xml-protocol"
+    },
+    "keywords": [
+        "cds",
+        "cap",
+        "trim",
+        "plugin"
+    ],
+    "author": "Neoimpulse GmbH",
+    "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    },
+    "files": [
+        "cds-plugin.js",
+        "package.json",
+        "LICENSE",
+        "README.md"
+    ],
+    "dependencies": {
+        "@sap/cds": "^8",
+        "express": "^4",
+        "xml2js": "^0.6.2"
+    },
+    "devDependencies": {
+        "prettier": "^3.3.3",
+        "semantic-release": "^24.0.0"
+    },
+    "cds": {
+        "requires": {
+            "cap-js-xml-protocol": {}
+        }
+    }
+}
