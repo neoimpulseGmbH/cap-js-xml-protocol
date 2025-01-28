@@ -25,7 +25,9 @@
         "cds-plugin.js",
         "package.json",
         "LICENSE",
-        "README.md"
+        "README.md",
+        "index.js",
+        "lib"
     ],
     "dependencies": {
         "@sap/cds": "^8",
