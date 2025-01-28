@@ -1,7 +1,7 @@
 {
     "name": "@neoimpulse/cap-js-xml-protocol",
     "version": "0.0.0-development",
-    "description": "A CDS plugin to provide the xml protocol",
+    "description": "A CDS plugin to provide the xml protocol.",
     "main": "index.js",
     "scripts": {
         "pretty": "npx prettier --write ."
